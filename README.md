@@ -1,16 +1,101 @@
-# React + Vite
+# React Todo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A responsive Todo application built with React.js.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* Add new tasks
+* Edit existing tasks
+* Delete tasks
+* Mark tasks as completed
+* Form validation
+* Save tasks to localStorage
+* Tasks remain after refreshing the page
+* Responsive mobile layout
+* Accessible labels and controls
+* Unique task IDs using `crypto.randomUUID()`
+* Basic automated tests
 
-## React Compiler
+## Technologies
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* React
+* JavaScript
+* Vite
+* CSS
+* LocalStorage
+* Vitest
+* React Testing Library
 
-## Expanding the Oxlint configuration
+## React Concepts Used
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+* `useState`
+* `useEffect`
+* JSX
+* Props and state concepts
+* `map()`
+* `filter()`
+* Controlled inputs
+* Forms and `onSubmit`
+* `onChange`
+* `onClick`
+* Conditional rendering
+* Functional state updates
+* Spread operator
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ch-mohsin-pervaiz/Todo-.git
+```
+
+Open the project:
+
+```bash
+cd Todo-
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Open the local URL shown by Vite in your browser.
+
+## Run Tests
+
+```bash
+npm test
+```
+
+## Build for Production
+
+```bash
+npm run build
+```
+
+## Project Structure
+
+```text
+Todo-
+├── src
+│   ├── App.jsx
+│   ├── App.css
+│   ├── App.test.jsx
+│   ├── index.css
+│   └── main.jsx
+├── public
+├── package.json
+├── package-lock.json
+├── vite.config.js
+└── README.md
+
+

@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
+const STORAGE_KEY = "react-todo-tasks";
 function App() {
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState(() => {
+        try {
+            const savedTasks = localStorage.getItem(STORAGE_KEY);
+            return savedTasks ? JSON.parse(savedTasks) : [];
+        } catch {
+            return [];
+        }
+    });
+
     const [taskInput, setTaskInput] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [editingId, setEditingId] = useState(null);
+    const [editingText, setEditingText] = useState("");
 
-    function addTask() {
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }, [tasks]);
+
+    function addTask(event) {
+        event.preventDefault();
+
         const taskText = taskInput.trim();
 
         if (taskText === "") {
@@ -14,102 +31,210 @@ function App() {
             return;
         }
 
-        setErrorMessage("");
-
         const newTask = {
-            id: Date.now(),
+            id: crypto.randomUUID(),
             text: taskText,
             completed: false
         };
 
-        setTasks([...tasks, newTask]);
-
+        setTasks((previousTasks) => [...previousTasks, newTask]);
         setTaskInput("");
+        setErrorMessage("");
     }
 
     function toggleTask(id) {
-        setTasks(
-            tasks.map(function(task) {
-                if (task.id === id) {
-                    return {
-                        ...task,
-                        completed: !task.completed
-                    };
-                }
-
-                return task;
-            })
+        setTasks((previousTasks) =>
+            previousTasks.map((task) =>
+                task.id === id
+                    ? { ...task, completed: !task.completed }
+                    : task
+            )
         );
     }
 
-    function handleKeyDown(event) {
-        if (event.key === "Enter") {
-            addTask();
+    function deleteTask(id) {
+        setTasks((previousTasks) =>
+            previousTasks.filter((task) => task.id !== id)
+        );
+    }
+
+    function startEditing(task) {
+        setEditingId(task.id);
+        setEditingText(task.text);
+        setErrorMessage("");
+    }
+
+    function saveEdit(event, id) {
+        event.preventDefault();
+
+        const updatedText = editingText.trim();
+
+        if (updatedText === "") {
+            setErrorMessage("Task cannot be empty.");
+            return;
         }
+
+        setTasks((previousTasks) =>
+            previousTasks.map((task) =>
+                task.id === id
+                    ? { ...task, text: updatedText }
+                    : task
+            )
+        );
+
+        setEditingId(null);
+        setEditingText("");
+        setErrorMessage("");
+    }
+
+    function cancelEdit() {
+        setEditingId(null);
+        setEditingText("");
+        setErrorMessage("");
     }
 
     return (
-        <div className="todo-container">
+        <main className="page-container">
+            <section
+                className="todo-container"
+                aria-labelledby="todo-title"
+            >
+                <h1 id="todo-title">Todo App</h1>
 
-            <h1>Todo App</h1>
+                <form
+                    className="input-section"
+                    onSubmit={addTask}
+                >
+                
+                    <div className="input-row">
+                        <input
+                            id="taskInput"
+                            type="text"
+                            placeholder="Enter a task..."
+                            value={taskInput}
+                            onChange={(event) => {
+                                setTaskInput(event.target.value);
 
-            <div className="input-section">
+                                if (errorMessage) {
+                                    setErrorMessage("");
+                                }
+                            }}
+                        />
 
-                <input
-                    type="text"
-                    placeholder="Enter a task..."
-                    value={taskInput}
-                    onChange={(event) => setTaskInput(event.target.value)}
-                    onKeyDown={handleKeyDown}
-                />
+                        <button type="submit">
+                            Add
+                        </button>
+                    </div>
+                </form>
 
-                <button onClick={addTask}>
-                    Add
-                </button>
+                {errorMessage && (
+                    <p
+                        className="error-message"
+                        role="alert"
+                    >
+                        {errorMessage}
+                    </p>
+                )}
 
-            </div>
-
-            <p className="error-message">
-                {errorMessage}
-            </p>
-
-            <ul className="task-list">
-
-                {tasks.map(function(task) {
-
-                    return (
-                        <li className="task-item" key={task.id}>
-
-                            <div className="task-left">
-
-                                <input
-                                    type="checkbox"
-                                    className="task-checkbox"
-                                    checked={task.completed}
-                                    onChange={() => toggleTask(task.id)}
-                                />
-
-                                <span
-                                    className={
-                                        task.completed
-                                            ? "task-text completed"
-                                            : "task-text"
+                <ul
+                    className="task-list"
+                    aria-label="Todo tasks"
+                >
+                    {tasks.map((task) => (
+                        <li
+                            className="task-item"
+                            key={task.id}
+                        >
+                            {editingId === task.id ? (
+                                <form
+                                    className="edit-form"
+                                    onSubmit={(event) =>
+                                        saveEdit(event, task.id)
                                     }
                                 >
-                                    {task.text}
-                                </span>
+                                    <label htmlFor={`edit-${task.id}`}>
+                                        Edit task
+                                    </label>
 
-                            </div>
+                                    <input
+                                        id={`edit-${task.id}`}
+                                        type="text"
+                                        value={editingText}
+                                        onChange={(event) =>
+                                            setEditingText(
+                                                event.target.value
+                                            )
+                                        }
+                                        autoFocus
+                                    />
 
+                                    <div className="task-actions">
+                                        <button type="submit">
+                                            Save
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={cancelEdit}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <>
+                                    <div className="task-left">
+                                        <input
+                                            id={`task-${task.id}`}
+                                            type="checkbox"
+                                            className="task-checkbox"
+                                            checked={task.completed}
+                                            onChange={() =>
+                                                toggleTask(task.id)
+                                            }
+                                        />
+
+                                        <label
+                                            htmlFor={`task-${task.id}`}
+                                            className={
+                                                task.completed
+                                                    ? "task-text completed"
+                                                    : "task-text"
+                                            }
+                                        >
+                                            {task.text}
+                                        </label>
+                                    </div>
+
+                                    <div className="task-actions">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                startEditing(task)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                deleteTask(task.id)
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </li>
-                    );
+                    ))}
+                </ul>
 
-                })}
-
-            </ul>
-
-        </div>
+            </section>
+        </main>
     );
 }
 
 export default App;
+
