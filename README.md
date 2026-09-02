@@ -12,9 +12,6 @@ A responsive Todo application built with React.js.
 * Save tasks to localStorage
 * Tasks remain after refreshing the page
 * Responsive mobile layout
-* Accessible labels and controls
-* Unique task IDs using `crypto.randomUUID()`
-* Basic automated tests
 
 ## Technologies
 
@@ -24,7 +21,6 @@ A responsive Todo application built with React.js.
 * CSS
 * LocalStorage
 * Vitest
-* React Testing Library
 
 ## React Concepts Used
 
@@ -90,7 +86,6 @@ Todo-
 │   ├── App.jsx
 │   ├── App.css
 │   ├── App.test.jsx
-│   ├── index.css
 │   └── main.jsx
 ├── public
 ├── package.json
