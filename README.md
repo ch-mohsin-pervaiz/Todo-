@@ -9,8 +9,8 @@ A responsive Todo application built with React.js.
 * Delete tasks
 * Mark tasks as completed
 * Form validation
-* Save tasks to localStorage
-* Tasks remain after refreshing the page
+* Save tasks to MongoDB
+* Tasks remain after refreshing the page or opening the app again
 * Responsive mobile layout
 
 ## Technologies
@@ -19,7 +19,8 @@ A responsive Todo application built with React.js.
 * JavaScript
 * Vite
 * CSS
-* LocalStorage
+* Express
+* MongoDB with Mongoose
 * Vitest
 
 ## React Concepts Used
@@ -58,13 +59,23 @@ Install dependencies:
 npm install
 ```
 
+Create a `.env` file in this project directory:
+
+```env
+MONGO_URI=mongodb://localhost:27017/todo_db
+PORT=3000
+```
+
+Make sure MongoDB is running before starting the app.
+
 Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open the local URL shown by Vite in your browser.
+Open the local URL shown by Vite in your browser. `npm run dev` starts both the
+Express API and Vite.
 
 ## Run Tests
 

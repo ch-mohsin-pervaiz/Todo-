@@ -1,13 +1,9 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "./App";
 
 describe("Todo App", () => {
-    beforeEach(() => {
-        localStorage.clear();
-    });
-
     it("adds a task", () => {
         render(<App />);
 
@@ -133,23 +129,5 @@ describe("Todo App", () => {
         ).toBeInTheDocument();
     });
 
-    it("loads tasks from localStorage", () => {
-        localStorage.setItem(
-            "react-todo-tasks",
-            JSON.stringify([
-                {
-                    id: "test-id",
-                    text: "Saved task",
-                    completed: false
-                }
-            ])
-        );
-
-        render(<App />);
-
-        expect(
-            screen.getByText("Saved task")
-        ).toBeInTheDocument();
-    });
 });
 

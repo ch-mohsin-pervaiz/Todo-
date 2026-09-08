@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const STORAGE_KEY = "react-todo-tasks";
 function App() {
-    const [tasks, setTasks] = useState(() => {
-        try {
-            const savedTasks = localStorage.getItem(STORAGE_KEY);
-            return savedTasks ? JSON.parse(savedTasks) : [];
-        } catch {
-            return [];
-        }
-    });
+    const [tasks, setTasks] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [taskInput, setTaskInput] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -18,8 +11,23 @@ function App() {
     const [editingText, setEditingText] = useState("");
 
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-    }, [tasks]);
+        async function loadTasks() {
+            try {
+                const response = await fetch("/api/tasks");
+                if (!response.ok) {
+                    throw new Error("Could not load tasks.");
+                }
+
+                setTasks(await response.json());
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        loadTasks();
+    }, []);
 
     function addTask(event) {
         event.preventDefault();
@@ -31,31 +39,43 @@ function App() {
             return;
         }
 
-        const newTask = {
-            id: crypto.randomUUID(),
-            text: taskText,
-            completed: false
-        };
+        fetch("/api/tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: taskText })
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error("Could not save task.");
+                }
 
-        setTasks((previousTasks) => [...previousTasks, newTask]);
-        setTaskInput("");
-        setErrorMessage("");
+                const savedTask = await response.json();
+                setTasks((previousTasks) => [
+                    ...previousTasks,
+                    savedTask
+                ]);
+                setTaskInput("");
+                setErrorMessage("");
+            })
+            .catch((error) => setErrorMessage(error.message));
     }
 
     function toggleTask(id) {
-        setTasks((previousTasks) =>
-            previousTasks.map((task) =>
-                task.id === id
-                    ? { ...task, completed: !task.completed }
-                    : task
-            )
-        );
+        const task = tasks.find((item) => item.id === id);
+        if (!task) return;
+
+        updateTask(id, { completed: !task.completed });
     }
 
     function deleteTask(id) {
-        setTasks((previousTasks) =>
-            previousTasks.filter((task) => task.id !== id)
-        );
+        fetch(`/api/tasks/${id}`, { method: "DELETE" })
+            .then((response) => {
+                if (!response.ok) throw new Error("Could not delete task.");
+                setTasks((previousTasks) =>
+                    previousTasks.filter((task) => task.id !== id)
+                );
+            })
+            .catch((error) => setErrorMessage(error.message));
     }
 
     function startEditing(task) {
@@ -74,17 +94,30 @@ function App() {
             return;
         }
 
-        setTasks((previousTasks) =>
-            previousTasks.map((task) =>
-                task.id === id
-                    ? { ...task, text: updatedText }
-                    : task
-            )
-        );
+        updateTask(id, { text: updatedText }, () => {
+            setEditingId(null);
+            setEditingText("");
+            setErrorMessage("");
+        });
+    }
 
-        setEditingId(null);
-        setEditingText("");
-        setErrorMessage("");
+    function updateTask(id, changes, onSuccess) {
+        fetch(`/api/tasks/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(changes)
+        })
+            .then(async (response) => {
+                if (!response.ok) throw new Error("Could not update task.");
+                const updatedTask = await response.json();
+                setTasks((previousTasks) =>
+                    previousTasks.map((task) =>
+                        task.id === id ? updatedTask : task
+                    )
+                );
+                onSuccess?.();
+            })
+            .catch((error) => setErrorMessage(error.message));
     }
 
     function cancelEdit() {
@@ -135,6 +168,8 @@ function App() {
                         {errorMessage}
                     </p>
                 )}
+
+                {isLoading && <p>Loading tasks...</p>}
 
                 <ul
                     className="task-list"
