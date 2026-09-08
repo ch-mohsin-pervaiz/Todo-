@@ -89,19 +89,6 @@ npm test
 npm run build
 ```
 
-## Project Structure
 
-```text
-Todo-
-├── src
-│   ├── App.jsx
-│   ├── App.css
-│   ├── App.test.jsx
-│   └── main.jsx
-├── public
-├── package.json
-├── package-lock.json
-├── vite.config.js
-└── README.md
 
 
