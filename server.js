@@ -6,7 +6,7 @@ import { Task } from "./models/Task.js";
 dotenv.config();
 dotenv.config({ path: "../.env" });
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -62,6 +62,11 @@ function formatTask(task) {
     };
 }
 
-connectDB()
-    .then(() => app.listen(port, () => console.log(`API running on port ${port}`)))
-    .catch(() => process.exit(1));
+export async function startServer() {
+    await connectDB();
+    app.listen(port, () => console.log(`API running on port ${port}`));
+}
+
+if (process.env.VERCEL !== "1") {
+    startServer().catch(() => process.exit(1));
+}

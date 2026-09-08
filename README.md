@@ -89,6 +89,25 @@ npm test
 npm run build
 ```
 
+## Deploy to Vercel
 
+The project includes a Vercel serverless API in `api/[...route].js`. Deploy the
+repository from GitHub and use these project settings:
 
+* Framework preset: Vite
+* Build command: `npm run build`
+* Output directory: `dist`
 
+Create a MongoDB Atlas database and add this environment variable in the Vercel
+project settings:
+
+```env
+MONGO_URI=your_mongodb_atlas_connection_string
+```
+
+Do not use the local MongoDB URL in production. Add the Vercel deployment IP
+access or allow access from anywhere in MongoDB Atlas, depending on your
+security requirements.
+
+After deployment, the React frontend and `/api/tasks` endpoints use the same
+Vercel domain.
