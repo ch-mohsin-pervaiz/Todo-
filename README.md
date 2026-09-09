@@ -102,7 +102,7 @@ Create a MongoDB Atlas database and add this environment variable in the Vercel
 project settings:
 
 ```env
-MONGO_URI=your_mongodb_atlas_connection_string
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster-hostname>.mongodb.net/todoDB?retryWrites=true&w=majority
 ```
 
 Do not use the local MongoDB URL in production. Add the Vercel deployment IP

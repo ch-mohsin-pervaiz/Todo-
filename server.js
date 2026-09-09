@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import { connectDB } from "./db.js";
+import { connectDB } from "./config/db.js";
 import { Task } from "./models/Task.js";
 
 dotenv.config();
@@ -31,9 +31,23 @@ app.post("/api/tasks", async (request, response) => {
 
 app.patch("/api/tasks/:id", async (request, response) => {
     try {
+        const changes = {};
+
+        if (typeof request.body.text === "string") {
+            changes.text = request.body.text.trim();
+        }
+
+        if (typeof request.body.completed === "boolean") {
+            changes.completed = request.body.completed;
+        }
+
+        if (Object.keys(changes).length === 0) {
+            return response.status(400).json({ message: "No valid task changes provided." });
+        }
+
         const task = await Task.findByIdAndUpdate(
             request.params.id,
-            request.body,
+            { $set: changes },
             { new: true, runValidators: true }
         );
 

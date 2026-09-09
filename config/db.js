@@ -27,6 +27,3 @@ export const connectDB = async () => {
     }
 };
 
-
-
-
