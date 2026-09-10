@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import Login from "./pages/login.jsx";
+import Signup from "./pages/signup.jsx";
 
 function App() {
     const [tasks, setTasks] = useState([]);
@@ -9,6 +11,9 @@ function App() {
     const [errorMessage, setErrorMessage] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [editingText, setEditingText] = useState("");
+    const [page, setPage] = useState(
+        () => (localStorage.getItem("token") ? "todo" : "login")
+    );
 
     useEffect(() => {
         async function loadTasks() {
@@ -126,13 +131,52 @@ function App() {
         setErrorMessage("");
     }
 
+    function handleLoginSuccess() {
+        setPage("todo");
+        setErrorMessage("");
+    }
+
+    function handleLogout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setTasks([]);
+        setPage("login");
+    }
+
+    if (page === "login") {
+        return (
+            <Login
+                onLoginSuccess={handleLoginSuccess}
+                onShowSignup={() => setPage("signup")}
+            />
+        );
+    }
+
+    if (page === "signup") {
+        return (
+            <Signup
+                onSignupSuccess={() => setPage("login")}
+                onShowLogin={() => setPage("login")}
+            />
+        );
+    }
+
     return (
         <main className="page-container">
             <section
                 className="todo-container"
                 aria-labelledby="todo-title"
             >
-                <h1 id="todo-title">Todo App</h1>
+                <div className="todo-header">
+                    <h1 id="todo-title">Todo App</h1>
+                    <button
+                        className="logout-button"
+                        type="button"
+                        onClick={handleLogout}
+                    >
+                        Log out
+                    </button>
+                </div>
 
                 <form
                     className="input-section"

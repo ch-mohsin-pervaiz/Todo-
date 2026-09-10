@@ -15,8 +15,10 @@
     "test": "vitest"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

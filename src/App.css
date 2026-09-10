@@ -38,6 +38,19 @@ h1 {
     color: black;
 }
 
+.todo-header {
+    position: relative;
+}
+
+.logout-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 7px 11px;
+    font-size: 13px;
+    background-color: #f44336;
+}
+
 .input-section {
     display: flex;
     flex-direction: column;

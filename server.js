@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 import express from "express";
 import { connectDB } from "./config/db.js";
 import { Task } from "./models/Task.js";
+import loginHandler from "./api/auth/login.js";
+import signupHandler from "./api/auth/signup.js";
 
 dotenv.config();
 dotenv.config({ path: "../.env" });
@@ -10,6 +12,9 @@ export const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.post("/api/auth/login", loginHandler);
+app.post("/api/auth/signup", signupHandler);
 
 app.get("/api/tasks", async (_request, response) => {
     try {

@@ -64,6 +64,7 @@ Create a `.env` file in this project directory:
 ```env
 MONGO_URI=mongodb://localhost:27017/todo_db
 PORT=3000
+JWT_SECRET=replace-with-a-long-random-secret
 ```
 
 Make sure MongoDB is running before starting the app.
@@ -103,6 +104,7 @@ project settings:
 
 ```env
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster-hostname>.mongodb.net/todoDB?retryWrites=true&w=majority
+JWT_SECRET=replace-with-a-long-random-secret
 ```
 
 Do not use the local MongoDB URL in production. Add the Vercel deployment IP
