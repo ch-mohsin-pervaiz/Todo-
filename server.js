@@ -4,6 +4,8 @@ import { connectDB } from "./config/db.js";
 import { Task } from "./models/Task.js";
 import loginHandler from "./api/auth/login.js";
 import signupHandler from "./api/auth/signup.js";
+import googleHandler from "./api/auth/google.js";
+import googleCallbackHandler from "./api/auth/google/callback.js";
 
 dotenv.config();
 dotenv.config({ path: "../.env" });
@@ -15,6 +17,8 @@ app.use(express.json());
 
 app.post("/api/auth/login", loginHandler);
 app.post("/api/auth/signup", signupHandler);
+app.get("/api/auth/google", googleHandler);
+app.get("/api/auth/google/callback", googleCallbackHandler);
 
 app.get("/api/tasks", async (_request, response) => {
     try {

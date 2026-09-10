@@ -15,7 +15,10 @@ export default async function handler(request, response) {
         await connectDB();
 
         if (!process.env.JWT_SECRET) {
-            throw new Error("JWT_SECRET is not configured");
+            console.error("JWT_SECRET is not configured");
+            return response.status(500).json({
+                message: "Login is not configured on the server. Add JWT_SECRET in Vercel environment variables."
+            });
         }
 
         const { email, password } = request.body || {};

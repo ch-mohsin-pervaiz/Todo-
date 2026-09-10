@@ -48,6 +48,10 @@ function Login({ onLoginSuccess, onShowSignup }) {
         }
     }
 
+    function handleGoogleLogin() {
+        window.location.assign("/api/auth/google");
+    }
+
     return (
         <main className="auth-page">
             <section className="auth-shell">
@@ -102,6 +106,19 @@ function Login({ onLoginSuccess, onShowSignup }) {
                             {isSubmitting ? "Logging in..." : "Log in"}
                         </button>
                     </form>
+
+                    <div className="auth-divider">
+                        <span>or continue with</span>
+                    </div>
+
+                    <button
+                        className="auth-google"
+                        type="button"
+                        onClick={handleGoogleLogin}
+                    >
+                        <span className="google-mark" aria-hidden="true">G</span>
+                        Continue with Google
+                    </button>
 
                     <p className="auth-switch">
                         Don't have an account?{" "}

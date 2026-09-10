@@ -3,6 +3,19 @@ import "./App.css";
 import Login from "./pages/login.jsx";
 import Signup from "./pages/signup.jsx";
 
+function getInitialPage() {
+    const query = new URLSearchParams(window.location.search);
+    const authToken = query.get("authToken");
+
+    if (authToken) {
+        localStorage.setItem("token", authToken);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return "todo";
+    }
+
+    return localStorage.getItem("token") ? "todo" : "login";
+}
+
 function App() {
     const [tasks, setTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -11,9 +24,7 @@ function App() {
     const [errorMessage, setErrorMessage] = useState("");
     const [editingId, setEditingId] = useState(null);
     const [editingText, setEditingText] = useState("");
-    const [page, setPage] = useState(
-        () => (localStorage.getItem("token") ? "todo" : "login")
-    );
+    const [page, setPage] = useState(getInitialPage);
 
     useEffect(() => {
         async function loadTasks() {

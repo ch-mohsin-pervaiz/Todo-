@@ -65,6 +65,10 @@ Create a `.env` file in this project directory:
 MONGO_URI=mongodb://localhost:27017/todo_db
 PORT=3000
 JWT_SECRET=replace-with-a-long-random-secret
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
+FRONTEND_URL=http://localhost:5173
 ```
 
 Make sure MongoDB is running before starting the app.
@@ -105,6 +109,10 @@ project settings:
 ```env
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster-hostname>.mongodb.net/todoDB?retryWrites=true&w=majority
 JWT_SECRET=replace-with-a-long-random-secret
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=https://your-project.vercel.app/api/auth/google/callback
+FRONTEND_URL=https://your-project.vercel.app
 ```
 
 Do not use the local MongoDB URL in production. Add the Vercel deployment IP
