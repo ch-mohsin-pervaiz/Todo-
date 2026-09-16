@@ -16,6 +16,21 @@ function getInitialPage() {
     return localStorage.getItem("token") ? "todo" : "login";
 }
 
+function authenticatedHeaders(includeJson = false) {
+    const headers = {};
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (includeJson) {
+        headers["Content-Type"] = "application/json";
+    }
+
+    return headers;
+}
+
 function App() {
     const [tasks, setTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +44,9 @@ function App() {
     useEffect(() => {
         async function loadTasks() {
             try {
-                const response = await fetch("/api/tasks");
+                const response = await fetch("/api/tasks", {
+                    headers: authenticatedHeaders()
+                });
                 if (!response.ok) {
                     throw new Error("Could not load tasks.");
                 }
@@ -57,7 +74,7 @@ function App() {
 
         fetch("/api/tasks", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authenticatedHeaders(true),
             body: JSON.stringify({ text: taskText })
         })
             .then(async (response) => {
@@ -84,7 +101,10 @@ function App() {
     }
 
     function deleteTask(id) {
-        fetch(`/api/tasks/${id}`, { method: "DELETE" })
+        fetch(`/api/tasks/${id}`, {
+            method: "DELETE",
+            headers: authenticatedHeaders()
+        })
             .then((response) => {
                 if (!response.ok) throw new Error("Could not delete task.");
                 setTasks((previousTasks) =>
@@ -120,7 +140,7 @@ function App() {
     function updateTask(id, changes, onSuccess) {
         fetch(`/api/tasks/${id}`, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: authenticatedHeaders(true),
             body: JSON.stringify(changes)
         })
             .then(async (response) => {

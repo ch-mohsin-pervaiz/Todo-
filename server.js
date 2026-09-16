@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import { connectDB } from "./config/db.js";
+import { authenticate } from "./config/auth.js";
 import { Task } from "./models/Task.js";
 import loginHandler from "./api/auth/login.js";
 import signupHandler from "./api/auth/signup.js";
@@ -20,9 +21,12 @@ app.post("/api/auth/signup", signupHandler);
 app.get("/api/auth/google", googleHandler);
 app.get("/api/auth/google/callback", googleCallbackHandler);
 
-app.get("/api/tasks", async (_request, response) => {
+app.get("/api/tasks", async (request, response) => {
+    const user = authenticate(request, response);
+    if (!user) return;
+
     try {
-        const tasks = await Task.find().sort({ createdAt: 1 });
+        const tasks = await Task.find({ owner: user.userId }).sort({ createdAt: 1 });
         response.json(tasks.map(formatTask));
     } catch {
         response.status(500).json({ message: "Could not load tasks." });
@@ -30,8 +34,14 @@ app.get("/api/tasks", async (_request, response) => {
 });
 
 app.post("/api/tasks", async (request, response) => {
+    const user = authenticate(request, response);
+    if (!user) return;
+
     try {
-        const task = await Task.create({ text: request.body.text });
+        const task = await Task.create({
+            owner: user.userId,
+            text: request.body.text
+        });
         response.status(201).json(formatTask(task));
     } catch {
         response.status(400).json({ message: "Task text is required." });
@@ -39,6 +49,9 @@ app.post("/api/tasks", async (request, response) => {
 });
 
 app.patch("/api/tasks/:id", async (request, response) => {
+    const user = authenticate(request, response);
+    if (!user) return;
+
     try {
         const changes = {};
 
@@ -54,8 +67,8 @@ app.patch("/api/tasks/:id", async (request, response) => {
             return response.status(400).json({ message: "No valid task changes provided." });
         }
 
-        const task = await Task.findByIdAndUpdate(
-            request.params.id,
+        const task = await Task.findOneAndUpdate(
+            { _id: request.params.id, owner: user.userId },
             { $set: changes },
             { new: true, runValidators: true }
         );
@@ -68,8 +81,14 @@ app.patch("/api/tasks/:id", async (request, response) => {
 });
 
 app.delete("/api/tasks/:id", async (request, response) => {
+    const user = authenticate(request, response);
+    if (!user) return;
+
     try {
-        const task = await Task.findByIdAndDelete(request.params.id);
+        const task = await Task.findOneAndDelete({
+            _id: request.params.id,
+            owner: user.userId
+        });
         if (!task) return response.status(404).json({ message: "Task not found." });
         response.status(204).end();
     } catch {

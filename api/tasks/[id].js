@@ -1,4 +1,5 @@
 import { connectDB } from "../../config/db.js";
+import { authenticate } from "../../config/auth.js";
 import { Task } from "../../models/Task.js";
 
 function formatTask(task) {
@@ -12,6 +13,8 @@ function formatTask(task) {
 export default async function handler(request, response) {
     try {
         await connectDB();
+        const user = authenticate(request, response);
+        if (!user) return;
 
         if (request.method === "PATCH") {
             const body = typeof request.body === "string"
@@ -33,8 +36,8 @@ export default async function handler(request, response) {
                 });
             }
 
-            const task = await Task.findByIdAndUpdate(
-                request.query.id,
+            const task = await Task.findOneAndUpdate(
+                { _id: request.query.id, owner: user.userId },
                 { $set: changes },
                 { new: true, runValidators: true }
             );
@@ -47,7 +50,10 @@ export default async function handler(request, response) {
         }
 
         if (request.method === "DELETE") {
-            const task = await Task.findByIdAndDelete(request.query.id);
+            const task = await Task.findOneAndDelete({
+                _id: request.query.id,
+                owner: user.userId
+            });
 
             if (!task) {
                 return response.status(404).json({ message: "Task not found." });
