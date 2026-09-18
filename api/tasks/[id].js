@@ -6,7 +6,9 @@ function formatTask(task) {
     return {
         id: task._id.toString(),
         text: task.text,
-        completed: task.completed
+        completed: task.completed,
+        priority: task.priority,
+        dueDate: task.dueDate
     };
 }
 
@@ -28,6 +30,16 @@ export default async function handler(request, response) {
 
             if (typeof body.completed === "boolean") {
                 changes.completed = body.completed;
+            }
+
+            if (["low", "medium", "high"].includes(body.priority)) {
+                changes.priority = body.priority;
+            }
+
+            if (body.dueDate === null || body.dueDate === "") {
+                changes.dueDate = null;
+            } else if (typeof body.dueDate === "string") {
+                changes.dueDate = body.dueDate;
             }
 
             if (Object.keys(changes).length === 0) {

@@ -40,7 +40,9 @@ app.post("/api/tasks", async (request, response) => {
     try {
         const task = await Task.create({
             owner: user.userId,
-            text: request.body.text
+            text: request.body.text,
+            priority: request.body.priority,
+            dueDate: request.body.dueDate || null
         });
         response.status(201).json(formatTask(task));
     } catch {
@@ -61,6 +63,16 @@ app.patch("/api/tasks/:id", async (request, response) => {
 
         if (typeof request.body.completed === "boolean") {
             changes.completed = request.body.completed;
+        }
+
+        if (["low", "medium", "high"].includes(request.body.priority)) {
+            changes.priority = request.body.priority;
+        }
+
+        if (request.body.dueDate === null || request.body.dueDate === "") {
+            changes.dueDate = null;
+        } else if (typeof request.body.dueDate === "string") {
+            changes.dueDate = request.body.dueDate;
         }
 
         if (Object.keys(changes).length === 0) {
@@ -100,7 +112,9 @@ function formatTask(task) {
     return {
         id: task._id.toString(),
         text: task.text,
-        completed: task.completed
+        completed: task.completed,
+        priority: task.priority,
+        dueDate: task.dueDate
     };
 }
 

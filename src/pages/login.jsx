@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./auth.css";
 
-function Login({ onLoginSuccess, onShowSignup }) {
+function Login({ onLoginSuccess, onShowSignup, initialError }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState(initialError || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (initialError) {
+            sessionStorage.removeItem("authError");
+        }
+    }, [initialError]);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -49,6 +55,8 @@ function Login({ onLoginSuccess, onShowSignup }) {
     }
 
     function handleGoogleLogin() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         window.location.assign("/api/auth/google");
     }
 

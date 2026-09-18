@@ -69,7 +69,8 @@ h1 {
 }
 
 .input-row input,
-.edit-form input {
+.edit-form input,
+.search-input {
     flex: 1;
     min-width: 0;
     padding: 12px;
@@ -80,8 +81,62 @@ h1 {
 }
 
 .input-row input:focus,
-.edit-form input:focus {
+.edit-form input:focus,
+.search-input:focus {
     border-color: #333;
+}
+
+.task-options {
+    display: flex;
+    gap: 12px;
+}
+
+.task-options label {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.task-options select,
+.task-options input {
+    min-width: 0;
+    padding: 9px;
+    border: 2px solid black;
+    border-radius: 6px;
+    background-color: white;
+}
+
+.task-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.search-input {
+    width: 100%;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-button {
+    padding: 8px 12px;
+    background-color: #e8e8e8;
+    color: #222;
+}
+
+.filter-button:hover,
+.filter-button.selected {
+    background-color: #222;
+    color: white;
 }
 
 button {
@@ -126,6 +181,47 @@ button:hover {
     min-width: 0;
 }
 
+.task-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.priority-badge {
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.priority-low {
+    background-color: #e0f2fe;
+    color: #075985;
+}
+
+.priority-medium {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.priority-high {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.due-date {
+    color: #555;
+}
+
 .task-checkbox {
     width: 18px;
     height: 18px;
@@ -162,6 +258,7 @@ button:hover {
     text-align: center;
     color: #777;
     margin-top: 20px;
+    line-height: 1.5;
 }
 
 @media (max-width: 600px) {
@@ -179,6 +276,10 @@ button:hover {
 
     .input-row button {
         width: 100%;
+    }
+
+    .task-options {
+        flex-direction: column;
     }
 
     .task-item {

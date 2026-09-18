@@ -1,10 +1,20 @@
 import jwt from "jsonwebtoken";
-import { createGoogleClient } from "../../../config/google.js";
+import { createGoogleClient, getFrontendUrl } from "../../../config/google.js";
 import { connectDB } from "../../../config/db.js";
 import { User } from "../../../models/User.js";
 
 export default async function handler(request, response) {
     try {
+        if (request.query.error) {
+            const frontendUrl = getFrontendUrl(request);
+            const redirectUrl = new URL(frontendUrl);
+            redirectUrl.searchParams.set(
+                "authError",
+                "Google login was cancelled. Please try again."
+            );
+            return response.redirect(redirectUrl.toString());
+        }
+
         if (!request.query.code) {
             return response.status(400).json({
                 message: "Google authorization code is missing."
@@ -19,6 +29,10 @@ export default async function handler(request, response) {
 
         const client = createGoogleClient(request);
         const { tokens } = await client.getToken(request.query.code);
+        if (!tokens.id_token) {
+            throw new Error("Google did not return an ID token.");
+        }
+
         const ticket = await client.verifyIdToken({
             idToken: tokens.id_token,
             audience: process.env.GOOGLE_CLIENT_ID
@@ -56,16 +70,19 @@ export default async function handler(request, response) {
             { expiresIn: "7d" }
         );
 
-        const frontendUrl = process.env.FRONTEND_URL ||
-            `${request.protocol}://${request.get("host")}`;
+        const frontendUrl = getFrontendUrl(request);
         const redirectUrl = new URL(frontendUrl);
         redirectUrl.searchParams.set("authToken", token);
 
         return response.redirect(redirectUrl.toString());
     } catch (error) {
         console.error("Google callback error:", error);
-        return response.status(500).json({
-            message: "Could not complete Google login."
-        });
+        const frontendUrl = getFrontendUrl(request);
+        const redirectUrl = new URL(frontendUrl);
+        redirectUrl.searchParams.set(
+            "authError",
+            "Google login could not be completed. Check the OAuth redirect URL and try again."
+        );
+        return response.redirect(redirectUrl.toString());
     }
 }
