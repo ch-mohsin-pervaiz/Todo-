@@ -1,36 +1,43 @@
 import { OAuth2Client } from "google-auth-library";
-
 function requestOrigin(request) {
-    const forwardedProtocol = request.headers["x-forwarded-proto"];
-    const protocol = forwardedProtocol || request.protocol;
-    return `${protocol}://${request.get("host")}`;
+    const forwardedProtocol =
+        request.headers["x-forwarded-proto"] || "https";
+
+    const host =
+        request.headers.host || request.get("host");
+
+    return `${forwardedProtocol}://${host}`;
 }
 
 export function getGoogleRedirectUri(request) {
-    if (process.env.VERCEL === "1") {
-        return `${requestOrigin(request)}/api/auth/google/callback`;
+    if (process.env.GOOGLE_REDIRECT_URI) {
+        return process.env.GOOGLE_REDIRECT_URI;
     }
-
-    return process.env.GOOGLE_REDIRECT_URI ||
-        `${requestOrigin(request)}/api/auth/google/callback`;
+    return `${requestOrigin(request)}/api/auth/google/callback`;
 }
 
 export function getFrontendUrl(request) {
-    if (process.env.VERCEL === "1") {
-        return requestOrigin(request);
-    }
 
-    return process.env.FRONTEND_URL || requestOrigin(request);
+    if (process.env.FRONTEND_URL) {
+        return process.env.FRONTEND_URL;
+    }
+    return requestOrigin(request);
 }
 
 export function createGoogleClient(request) {
-    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-        throw new Error("Google OAuth credentials are not configured");
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+        throw new Error(
+            "Google OAuth credentials are not configured"
+        );
     }
 
     return new OAuth2Client(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
+        clientId,
+        clientSecret,
         getGoogleRedirectUri(request)
     );
 }
+
